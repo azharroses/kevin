@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulasi RAC DBR</title>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --primary: #003d82;
+      --primary-2: #005baa;
+      --accent: #f5a623;
+      --label: #3a3a5c;
+      --sub: #68748a;
+      --entry: #f7f9fc;
+      --border: #d0d8e8;
+      --danger: #c53030;
+      --success: #2d7d46;
+      --disabled: #d9dee7;
+      --shadow: 0 12px 30px rgba(15, 35, 60, .08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: #1a1a2e;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    header {
+      background: var(--primary);
+      color: #fff;
+      border-top: 5px solid var(--accent);
+    }
+
+    .header-inner {
+      width: min(940px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 18px 0 20px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(24px, 4vw, 34px);
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: #9ec9ff;
+      font-size: 13px;
+    }
+
+    main {
+      width: min(940px, calc(100% - 32px));
+      margin: 18px auto 36px;
+    }
+
+    .section-title {
+      margin: 18px 0 7px;
+      color: var(--sub);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-button {
+      min-height: 40px;
+      border-radius: 6px 6px 0 0;
+      background: transparent;
+      color: var(--label);
+      border: 1px solid transparent;
+      border-bottom: 0;
+      padding: 0 16px;
+    }
+
+    .tab-button.active {
+      background: var(--card);
+      color: var(--primary);
+      border-color: var(--border);
+      box-shadow: 0 -6px 18px rgba(15, 35, 60, .04);
+    }
+
+    .tab-panel[hidden] {
+      display: none;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 18px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--label);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--entry);
+      color: #1a1a2e;
+      font: 15px "Courier New", monospace;
+      padding: 0 12px;
+      outline: none;
+    }
+
+    input,
+    select {
+      height: 42px;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+      line-height: 1.45;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary-2);
+      box-shadow: 0 0 0 3px rgba(0, 91, 170, .12);
+    }
+
+    input:disabled {
+      background: var(--disabled);
+      color: #657080;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0 18px;
+    }
+
+    button.primary {
+      background: var(--primary);
+    }
+
+    button.secondary {
+      background: var(--primary-2);
+      width: 100%;
+      margin-top: 14px;
+    }
+
+    button.danger {
+      background: #e53e3e;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .62;
+    }
+
+    .result-empty {
+      margin: 0;
+      color: var(--sub);
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .result-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 9px 0;
+      border-bottom: 1px solid #e8edf5;
+    }
+
+    .result-row:last-child {
+      border-bottom: 0;
+    }
+
+    .result-label {
+      color: var(--label);
+      font-weight: 600;
+    }
+
+    .result-value {
+      color: var(--primary);
+      font-size: 20px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .result-status.ok {
+      color: var(--success);
+    }
+
+    .result-status.fail {
+      color: var(--danger);
+    }
+
+    .notice {
+      margin: 12px 0 0;
+      color: var(--sub);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .settings-bar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    .settings-bar .field {
+      margin: 0;
+    }
+
+    .settings-bar button {
+      min-width: 92px;
+    }
+
+    @media (max-width: 720px) {
+      .grid,
+      .actions,
+      .settings-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <p class="eyebrow">APLIKASI SUPPORT</p>
+      <h1>Simulasi Perhitungan RAC DBR</h1>
+      <p class="subtitle">Repayment Ability Check · Debt Burden Ratio</p>
+    </div>
+  </header>
+
+  <main>
+    <nav class="tabs" aria-label="Mode kalkulator">
+      <button class="tab-button active" type="button" data-tab="autoPanel">Cek Angsuran Otomatis</button>
+      <button class="tab-button" type="button" data-tab="manualPanel">Cek Angsuran Manual</button>
+    </nav>
+
+    <section class="card settings-bar">
+      <div class="field">
+        <label for="apiBaseUrl">URL API Cek Angsuran</label>
+        <input id="apiBaseUrl" placeholder="Kosongkan untuk pakai server ini. Contoh: http://10.22.xx.xx:5000" autocomplete="off">
+      </div>
+      <button class="primary" id="saveApiBaseUrl" type="button">Simpan</button>
+      <button class="danger" id="resetApiBaseUrl" type="button">Reset</button>
+      <p class="notice" id="apiSettingNotice" hidden></p>
+    </section>
+
+    <section class="tab-panel" id="autoPanel">
+    <form id="racForm" novalidate>
+      <p class="section-title">Profil Nasabah</p>
+      <section class="card">
+        <div class="grid">
+          <div class="field">
+            <label for="platform">Platform</label>
+            <select id="platform" name="platform"></select>
+          </div>
+          <div class="field">
+            <label for="kategori">Customer Category</label>
+            <select id="kategori" name="kategori"></select>
+          </div>
+          <div class="field">
+            <label for="pasangan">Status Pernikahan</label>
+            <select id="pasangan" name="pasangan">
+              <option value="TIDAK">TIDAK</option>
+              <option value="YA">YA</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="noOrder">No order</label>
+            <input id="noOrder" name="noOrder" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="ktpDebitur">NIK KTP Debitur</label>
+            <input id="ktpDebitur" name="ktpDebitur" inputmode="numeric" maxlength="16" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="ktpPasangan">NIK KTP Pasangan</label>
+            <input id="ktpPasangan" name="ktpPasangan" inputmode="numeric" maxlength="16" autocomplete="off">
+          </div>
+        </div>
+        <button class="secondary" id="cekAngsuran" type="button">Cek Angsuran</button>
+        <p class="notice" id="cekNotice" hidden></p>
+      </section>
+
+      <p class="section-title">Hasil API Cek Angsuran</p>
+      <section class="card">
+        <div class="field">
+          <label for="apiDebugOutput">Response API</label>
+          <textarea id="apiDebugOutput" readonly>Belum ada request cek angsuran.</textarea>
+        </div>
+      </section>
+
+      <p class="section-title">Data Angsuran</p>
+      <section class="card">
+        <div class="grid">
+          <div class="field">
+            <label for="angsuranDebitur">Angsuran Lain Debitur (Rp)</label>
+            <input id="angsuranDebitur" name="angsuranDebitur" inputmode="numeric" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="angsuranPasangan">Angsuran Lain Pasangan (Rp)</label>
+            <input id="angsuranPasangan" name="angsuranPasangan" inputmode="numeric" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="angsuranDiajukan">Angsuran Yang Diajukan (Rp)</label>
+            <input id="angsuranDiajukan" name="angsuranDiajukan" inputmode="numeric" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="angsuranMuf">Angsuran Aktif di MUF (Rp)</label>
+            <input id="angsuranMuf" name="angsuranMuf" inputmode="numeric" autocomplete="off">
+          </div>
+        </div>
+      </section>
+
+      <p class="section-title">Data Pendapatan</p>
+      <section class="card">
+        <div class="grid">
+          <div class="field">
+            <label for="pendapatanDebitur">Pendapatan Debitur (Rp)</label>
+            <input id="pendapatanDebitur" name="pendapatanDebitur" inputmode="numeric" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="pendapatanRange">Pendapatan Debitur Range BSI</label>
+            <input id="pendapatanRange" name="pendapatanRange" placeholder="Contoh: 10-20" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="pendapatanPasangan">Pendapatan Pasangan (Rp)</label>
+            <input id="pendapatanPasangan" name="pendapatanPasangan" inputmode="numeric" autocomplete="off">
+          </div>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button class="primary" type="submit">Hitung RAC / DBR</button>
+        <button class="danger" type="reset">Reset</button>
+      </div>
+    </form>
+
+    <p class="section-title">Hasil Perhitungan</p>
+    <section class="card" id="resultCard">
+      <p class="result-empty">Belum ada perhitungan</p>
+    </section>
+    </section>
+
+    <section class="tab-panel" id="manualPanel" hidden>
+      <form id="manualForm" novalidate>
+        <p class="section-title">Profil Nasabah Manual</p>
+        <section class="card">
+          <div class="grid">
+            <div class="field">
+              <label for="manualPlatform">Platform</label>
+              <select id="manualPlatform" name="manualPlatform"></select>
+            </div>
+            <div class="field">
+              <label for="manualKategori">Customer Category</label>
+              <select id="manualKategori" name="manualKategori"></select>
+            </div>
+            <div class="field">
+              <label for="manualPasangan">Status Pernikahan</label>
+              <select id="manualPasangan" name="manualPasangan">
+                <option value="TIDAK">TIDAK</option>
+                <option value="YA">YA</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="manualNoOrder">No order</label>
+              <input id="manualNoOrder" name="manualNoOrder" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="manualKtpDebitur">NIK KTP Debitur</label>
+              <input id="manualKtpDebitur" name="manualKtpDebitur" inputmode="numeric" maxlength="16" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="manualKtpPasangan">NIK KTP Pasangan</label>
+              <input id="manualKtpPasangan" name="manualKtpPasangan" inputmode="numeric" maxlength="16" autocomplete="off">
+            </div>
+          </div>
+        </section>
+
+        <p class="section-title">Data Angsuran Manual</p>
+        <section class="card">
+          <div class="grid">
+            <div class="field">
+              <label for="manualAngsuranDebitur">Angsuran Lain Debitur (Rp)</label>
+              <input id="manualAngsuranDebitur" name="manualAngsuranDebitur" inputmode="numeric" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="manualAngsuranPasangan">Angsuran Lain Pasangan (Rp)</label>
+              <input id="manualAngsuranPasangan" name="manualAngsuranPasangan" inputmode="numeric" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="manualAngsuranDiajukan">Angsuran Yang Diajukan (Rp)</label>
+              <input id="manualAngsuranDiajukan" name="manualAngsuranDiajukan" inputmode="numeric" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="manualAngsuranMuf">Angsuran Aktif di MUF (Rp)</label>
+              <input id="manualAngsuranMuf" name="manualAngsuranMuf" inputmode="numeric" autocomplete="off">
+            </div>
+          </div>
+        </section>
+
+        <p class="section-title">Data Pendapatan Manual</p>
+        <section class="card">
+          <div class="grid">
+            <div class="field">
+              <label for="manualPendapatanDebitur">Pendapatan Debitur (Rp)</label>
+              <input id="manualPendapatanDebitur" name="manualPendapatanDebitur" inputmode="numeric" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="manualPendapatanRange">Pendapatan Debitur Range BSI</label>
+              <input id="manualPendapatanRange" name="manualPendapatanRange" placeholder="Contoh: 10-20" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="manualPendapatanPasangan">Pendapatan Pasangan (Rp)</label>
+              <input id="manualPendapatanPasangan" name="manualPendapatanPasangan" inputmode="numeric" autocomplete="off">
+            </div>
+          </div>
+        </section>
+
+        <div class="actions">
+          <button class="primary" type="submit">Hitung RAC / DBR Manual</button>
+          <button class="danger" type="reset">Reset Manual</button>
+        </div>
+        <section class="card">
+          <div class="actions">
+            <button class="primary" id="copyManualToAuto" type="button">Salin ke Tab Otomatis</button>
+          </div>
+          <p class="notice" id="manualNotice" hidden></p>
+        </section>
+
+        <p class="section-title">Ringkasan Manual</p>
+        <section class="card" id="manualResultCard">
+          <p class="result-empty">Belum ada input manual</p>
+        </section>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const customerCategories = {
+      LIVIN: [
+        "LIVINREGCORPORATE1",
+        "LIVINEKOSISTEMCORP2",
+        "LIVINEKOSISTEMCORP3",
+        "LIVINREGPEMANDIRIAN1",
+        "LIVINREGPEMANDIRIAN2",
+        "LIVINREGMANDIRIAN3",
+        "LIVINREGPRIO",
+        "LIVINREGPRIVATE",
+        "LAINNYA"
+      ],
+      BSI: [
+        "NASABAH PRIORITAS",
+        "NASABAH PRIVATE",
+        "NASABAH PAYROLL BSI",
+        "LAINNYA"
+      ]
+    };
+
+    const form = document.querySelector("#racForm");
+    const platform = document.querySelector("#platform");
+    const kategori = document.querySelector("#kategori");
+    const pasangan = document.querySelector("#pasangan");
+    const resultCard = document.querySelector("#resultCard");
+    const cekNotice = document.querySelector("#cekNotice");
+    const manualForm = document.querySelector("#manualForm");
+    const manualNotice = document.querySelector("#manualNotice");
+    const manualResultCard = document.querySelector("#manualResultCard");
+    const manualPlatform = document.querySelector("#manualPlatform");
+    const manualKategori = document.querySelector("#manualKategori");
+    const manualPasangan = document.querySelector("#manualPasangan");
+    const apiBaseUrl = document.querySelector("#apiBaseUrl");
+    const apiSettingNotice = document.querySelector("#apiSettingNotice");
+    const apiDebugOutput = document.querySelector("#apiDebugOutput");
+    const apiBaseUrlStorageKey = "racDbrApiBaseUrl";
+
+    const rupiahInputs = [
+      "angsuranDebitur",
+      "angsuranPasangan",
+      "angsuranDiajukan",
+      "angsuranMuf",
+      "pendapatanDebitur",
+      "pendapatanPasangan",
+      "manualAngsuranDebitur",
+      "manualAngsuranPasangan",
+      "manualAngsuranDiajukan",
+      "manualAngsuranMuf",
+      "manualPendapatanDebitur",
+      "manualPendapatanPasangan"
+    ].map((id) => document.querySelector("#" + id));
+
+    function onlyDigits(text) {
+      return String(text || "").replace(/\D/g, "");
+    }
+
+    function toInt(text) {
+      const digits = onlyDigits(text);
+      return digits ? Number(digits) : 0;
+    }
+
+    function formatNumber(value) {
+      const digits = onlyDigits(value);
+      return digits ? Number(digits).toLocaleString("id-ID") : "";
+    }
+
+    function formatRupiahInput(value) {
+      return Number(value || 0).toLocaleString("id-ID");
+    }
+
+    function showAlert(message) {
+      window.alert(message);
+    }
+
+    function cleanApiBaseUrl(value) {
+      return String(value || "").trim().replace(/\/+$/, "");
+    }
+
+    function getCekAngsuranUrl() {
+      const baseUrl = cleanApiBaseUrl(localStorage.getItem(apiBaseUrlStorageKey));
+      return baseUrl ? `${baseUrl}/api/cek-angsuran` : "/api/cek-angsuran";
+    }
+
+    function showApiSettingNotice(message) {
+      apiSettingNotice.hidden = false;
+      apiSettingNotice.textContent = message;
+    }
+
+    function writeApiDebug(data) {
+      apiDebugOutput.value = typeof data === "string"
+        ? data
+        : JSON.stringify(data, null, 2);
+    }
+
+    function switchTab(panelId) {
+      document.querySelectorAll(".tab-button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.tab === panelId);
+      });
+
+      document.querySelectorAll(".tab-panel").forEach((panel) => {
+        panel.hidden = panel.id !== panelId;
+      });
+    }
+
+    function fillSelect(select, values) {
+      select.innerHTML = "";
+      values.forEach((value) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+    }
+
+    function refreshCategories() {
+      fillSelect(kategori, customerCategories[platform.value] || []);
+    }
+
+    function refreshManualCategories() {
+      fillSelect(manualKategori, customerCategories[manualPlatform.value] || []);
+    }
+
+    function applyPlatformState() {
+      const pendapatanDebitur = document.querySelector("#pendapatanDebitur");
+      const pendapatanRange = document.querySelector("#pendapatanRange");
+
+      if (platform.value === "LIVIN") {
+        pendapatanDebitur.disabled = false;
+        pendapatanRange.disabled = true;
+        pendapatanRange.value = "";
+      } else {
+        pendapatanDebitur.disabled = true;
+        pendapatanDebitur.value = "";
+        pendapatanRange.disabled = false;
+      }
+    }
+
+    function applyPasanganState() {
+      const hasPasangan = pasangan.value === "YA";
+      const fields = [
+        document.querySelector("#ktpPasangan"),
+        document.querySelector("#angsuranPasangan"),
+        document.querySelector("#pendapatanPasangan")
+      ];
+
+      fields.forEach((field) => {
+        field.disabled = !hasPasangan;
+        if (!hasPasangan) field.value = "";
+      });
+    }
+
+    function applyManualPlatformState() {
+      const pendapatanDebitur = document.querySelector("#manualPendapatanDebitur");
+      const pendapatanRange = document.querySelector("#manualPendapatanRange");
+
+      if (manualPlatform.value === "LIVIN") {
+        pendapatanDebitur.disabled = false;
+        pendapatanRange.disabled = true;
+        pendapatanRange.value = "";
+      } else {
+        pendapatanDebitur.disabled = true;
+        pendapatanDebitur.value = "";
+        pendapatanRange.disabled = false;
+      }
+    }
+
+    function applyManualPasanganState() {
+      const hasPasangan = manualPasangan.value === "YA";
+      const fields = [
+        document.querySelector("#manualKtpPasangan"),
+        document.querySelector("#manualAngsuranPasangan"),
+        document.querySelector("#manualPendapatanPasangan")
+      ];
+
+      fields.forEach((field) => {
+        field.disabled = !hasPasangan;
+        if (!hasPasangan) field.value = "";
+      });
+    }
+
+    function parseRange(rangeText) {
+      const match = String(rangeText || "").trim().match(/^(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)$/);
+      if (!match) return null;
+      const first = Number(match[1].replace(",", "."));
+      const second = Number(match[2].replace(",", "."));
+      if (!Number.isFinite(first) || !Number.isFinite(second) || first <= 0 || second <= 0) return null;
+      return { first, second };
+    }
+
+    function hitungRacDbr(data) {
+      let dbrPct = 0;
+      let lulus = false;
+
+      if (data.platform === "LIVIN") {
+        const totalPendapatan = data.onPasangan === "YA"
+          ? data.pendapatanDebitur + data.pendapatanPasangan
+          : data.pendapatanDebitur;
+        const totalAngsuran = data.onPasangan === "YA"
+          ? data.angsuranDiajukan + data.angsuranMuf + data.angsuranLainDebitur + data.angsuranLainPasangan
+          : data.angsuranDiajukan + data.angsuranMuf + data.angsuranLainDebitur;
+
+        dbrPct = totalAngsuran / totalPendapatan;
+
+        if (data.kategori === "LIVINREGPRIO" || data.kategori === "LIVINREGPRIVATE") {
+          lulus = true;
+        } else if ([
+          "LIVINREGCORPORATE1",
+          "LIVINEKOSISTEMCORP2",
+          "LIVINEKOSISTEMCORP3",
+          "LIVINREGPEMANDIRIAN1",
+          "LIVINREGPEMANDIRIAN2",
+          "LIVINREGMANDIRIAN3",
+          "LAINNYA"
+        ].includes(data.kategori)) {
+          const pct = dbrPct * 100;
+          lulus = (data.pendapatanDebitur <= 10000000 && pct < 40)
+            || (data.pendapatanDebitur > 10000000 && data.pendapatanDebitur < 20000000 && pct <= 50)
+            || (data.pendapatanDebitur >= 20000000 && pct <= 60);
+        }
+      } else {
+        const range = parseRange(data.pendapatanDebiturRange);
+        if (!range) {
+          throw new Error("Format Pendapatan Debitur Range BSI harus seperti 10-20.");
+        }
+
+        const pendapatanRange = ((range.first * 1000000) + (range.second * 1000000)) / 2;
+        const totalPendapatan = data.onPasangan === "YA"
+          ? pendapatanRange + data.pendapatanPasangan
+          : pendapatanRange;
+
+        dbrPct = (data.angsuranDiajukan + data.angsuranMuf + data.angsuranLainDebitur) / totalPendapatan;
+        lulus = ["NASABAH PRIORITAS", "NASABAH PRIVATE", "NASABAH PAYROLL BSI", "LAINNYA"].includes(data.kategori)
+          && ((pendapatanRange <= 10000000 && dbrPct * 100 <= 40)
+          || (pendapatanRange > 10000000 && dbrPct * 100 <= 50));
+      }
+
+      return {
+        dbrPct: dbrPct * 100,
+        lulus
+      };
+    }
+
+    function showResult(result) {
+      const statusClass = result.lulus ? "ok" : "fail";
+      const statusText = result.lulus ? "LULUS" : "TIDAK LULUS";
+
+      resultCard.innerHTML = `
+        <div class="result-row">
+          <span class="result-label">DBR (%)</span>
+          <span class="result-value">${result.dbrPct.toFixed(2)} %</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Status</span>
+          <span class="result-value result-status ${statusClass}">${statusText}</span>
+        </div>
+      `;
+    }
+
+    function showManualSummary(values) {
+      const total = values.angsuranDebitur
+        + values.angsuranPasangan
+        + values.angsuranDiajukan
+        + values.angsuranMuf;
+
+      manualResultCard.innerHTML = `
+        <div class="result-row">
+          <span class="result-label">Total Angsuran Manual</span>
+          <span class="result-value">Rp ${formatRupiahInput(total)}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Debitur + Pasangan</span>
+          <span class="result-value">Rp ${formatRupiahInput(values.angsuranDebitur + values.angsuranPasangan)}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Diajukan + MUF</span>
+          <span class="result-value">Rp ${formatRupiahInput(values.angsuranDiajukan + values.angsuranMuf)}</span>
+        </div>
+      `;
+    }
+
+    function getManualValues() {
+      return {
+        platform: manualPlatform.value,
+        kategori: manualKategori.value,
+        onPasangan: manualPasangan.value,
+        pendapatanDebitur: toInt(document.querySelector("#manualPendapatanDebitur").value),
+        pendapatanDebiturRange: document.querySelector("#manualPendapatanRange").value,
+        pendapatanPasangan: toInt(document.querySelector("#manualPendapatanPasangan").value),
+        angsuranLainDebitur: toInt(document.querySelector("#manualAngsuranDebitur").value),
+        angsuranLainPasangan: toInt(document.querySelector("#manualAngsuranPasangan").value),
+        angsuranDiajukan: toInt(document.querySelector("#manualAngsuranDiajukan").value),
+        angsuranMuf: toInt(document.querySelector("#manualAngsuranMuf").value)
+      };
+    }
+
+    function copyManualToAuto(values) {
+      platform.value = values.platform;
+      refreshCategories();
+      kategori.value = values.kategori;
+      pasangan.value = values.onPasangan;
+      applyPlatformState();
+      applyPasanganState();
+
+      document.querySelector("#noOrder").value = document.querySelector("#manualNoOrder").value;
+      document.querySelector("#ktpDebitur").value = document.querySelector("#manualKtpDebitur").value;
+      document.querySelector("#ktpPasangan").value = document.querySelector("#manualKtpPasangan").value;
+      document.querySelector("#angsuranDebitur").value = formatRupiahInput(values.angsuranLainDebitur);
+      document.querySelector("#angsuranPasangan").value = formatRupiahInput(values.angsuranLainPasangan);
+      document.querySelector("#angsuranDiajukan").value = formatRupiahInput(values.angsuranDiajukan);
+      document.querySelector("#angsuranMuf").value = formatRupiahInput(values.angsuranMuf);
+      document.querySelector("#pendapatanDebitur").value = formatRupiahInput(values.pendapatanDebitur);
+      document.querySelector("#pendapatanRange").value = values.pendapatanDebiturRange;
+      document.querySelector("#pendapatanPasangan").value = formatRupiahInput(values.pendapatanPasangan);
+    }
+
+    rupiahInputs.forEach((input) => {
+      input.addEventListener("input", () => {
+        input.value = formatNumber(input.value);
+      });
+    });
+
+    document.querySelectorAll(".tab-button").forEach((button) => {
+      button.addEventListener("click", () => switchTab(button.dataset.tab));
+    });
+
+    ["ktpDebitur", "ktpPasangan"].forEach((id) => {
+      document.querySelector("#" + id).addEventListener("input", (event) => {
+        event.target.value = onlyDigits(event.target.value).slice(0, 16);
+      });
+    });
+
+    ["manualKtpDebitur", "manualKtpPasangan"].forEach((id) => {
+      document.querySelector("#" + id).addEventListener("input", (event) => {
+        event.target.value = onlyDigits(event.target.value).slice(0, 16);
+      });
+    });
+
+    Object.keys(customerCategories).forEach((value) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      platform.appendChild(option);
+    });
+
+    Object.keys(customerCategories).forEach((value) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      manualPlatform.appendChild(option);
+    });
+
+    platform.addEventListener("change", () => {
+      refreshCategories();
+      applyPlatformState();
+    });
+
+    pasangan.addEventListener("change", applyPasanganState);
+
+    manualPlatform.addEventListener("change", () => {
+      refreshManualCategories();
+      applyManualPlatformState();
+    });
+
+    manualPasangan.addEventListener("change", applyManualPasanganState);
+
+    document.querySelector("#cekAngsuran").addEventListener("click", async () => {
+      const ktpDebitur = document.querySelector("#ktpDebitur").value.trim();
+      const ktpPasangan = document.querySelector("#ktpPasangan").value.trim();
+      const noOrder = document.querySelector("#noOrder").value.trim();
+      const cekButton = document.querySelector("#cekAngsuran");
+
+      if (ktpDebitur && ktpDebitur.length !== 16) {
+        showAlert(`NIK KTP Debitur harus 16 digit (saat ini ${ktpDebitur.length} digit).`);
+        return;
+      }
+
+      if (ktpPasangan && ktpPasangan.length !== 16) {
+        showAlert(`NIK KTP Pasangan harus 16 digit (saat ini ${ktpPasangan.length} digit).`);
+        return;
+      }
+
+      if (!ktpDebitur && !ktpPasangan) {
+        showAlert("Masukkan minimal satu NIK KTP untuk mengecek angsuran.");
+        return;
+      }
+
+      cekButton.disabled = true;
+      cekButton.textContent = "Mengambil Data...";
+      cekNotice.hidden = false;
+      cekNotice.textContent = "Mengambil data angsuran dari server.";
+
+      try {
+        const requestUrl = getCekAngsuranUrl();
+        const requestBody = {
+          ktp_debitur: ktpDebitur,
+          ktp_pasangan: pasangan.value === "YA" ? ktpPasangan : "",
+          no_order: noOrder
+        };
+
+        writeApiDebug({
+          request: {
+            method: "POST",
+            url: requestUrl,
+            body: requestBody
+          },
+          status: "Mengambil data"
+        });
+
+        const response = await fetch(requestUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        writeApiDebug({
+          request: {
+            method: "POST",
+            url: requestUrl,
+            body: requestBody
+          },
+          response: {
+            ok: response.ok,
+            status: response.status,
+            statusText: response.statusText,
+            body: result
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(result.detail || result.error || "Gagal mengambil data angsuran.");
+        }
+
+        document.querySelector("#angsuranDebitur").value = formatRupiahInput(result.angsuran_debitur);
+        document.querySelector("#angsuranMuf").value = formatRupiahInput(result.angsuran_muf);
+
+        if (pasangan.value === "YA") {
+          document.querySelector("#angsuranPasangan").value = formatRupiahInput(result.angsuran_pasangan);
+        }
+
+        cekNotice.textContent = "Data angsuran berhasil diambil. Nilainya masih bisa diubah manual.";
+      } catch (error) {
+        const isNetworkError = error instanceof TypeError && String(error.message || "").includes("fetch");
+        cekNotice.textContent = isNetworkError
+          ? "Tidak bisa terhubung ke backend. Jalankan aplikasi lewat Flask/Render Web Service, bukan membuka index.html langsung."
+          : (error.message || "Gagal mengambil data angsuran.");
+        if (isNetworkError) {
+          writeApiDebug({
+            error: cekNotice.textContent,
+            url: getCekAngsuranUrl()
+          });
+        }
+        showAlert(cekNotice.textContent);
+      } finally {
+        cekButton.disabled = false;
+        cekButton.textContent = "Cek Angsuran";
+      }
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const data = {
+        platform: platform.value,
+        kategori: kategori.value,
+        onPasangan: pasangan.value,
+        pendapatanDebitur: toInt(document.querySelector("#pendapatanDebitur").value),
+        pendapatanDebiturRange: document.querySelector("#pendapatanRange").value,
+        pendapatanPasangan: toInt(document.querySelector("#pendapatanPasangan").value),
+        angsuranLainDebitur: toInt(document.querySelector("#angsuranDebitur").value),
+        angsuranLainPasangan: toInt(document.querySelector("#angsuranPasangan").value),
+        angsuranDiajukan: toInt(document.querySelector("#angsuranDiajukan").value),
+        angsuranMuf: toInt(document.querySelector("#angsuranMuf").value)
+      };
+
+      if (!data.kategori) {
+        showAlert("Pilih Customer Category terlebih dahulu.");
+        return;
+      }
+
+      if (data.platform === "LIVIN" && data.pendapatanDebitur === 0) {
+        showAlert("Pendapatan Debitur tidak boleh nol.");
+        return;
+      }
+
+      if (data.platform === "BSI" && !parseRange(data.pendapatanDebiturRange)) {
+        showAlert("Format Pendapatan Debitur Range BSI harus seperti 10-20.");
+        return;
+      }
+
+      try {
+        showResult(hitungRacDbr(data));
+      } catch (error) {
+        showAlert(error.message || "Perhitungan gagal.");
+      }
+    });
+
+    form.addEventListener("reset", () => {
+      window.setTimeout(() => {
+        platform.value = "LIVIN";
+        pasangan.value = "TIDAK";
+        refreshCategories();
+        applyPlatformState();
+        applyPasanganState();
+        cekNotice.hidden = true;
+        resultCard.innerHTML = '<p class="result-empty">Belum ada perhitungan</p>';
+      });
+    });
+
+    manualForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const values = getManualValues();
+
+      if (!values.kategori) {
+        showAlert("Pilih Customer Category terlebih dahulu.");
+        return;
+      }
+
+      if (values.platform === "LIVIN" && values.pendapatanDebitur === 0) {
+        showAlert("Pendapatan Debitur tidak boleh nol.");
+        return;
+      }
+
+      if (values.platform === "BSI" && !parseRange(values.pendapatanDebiturRange)) {
+        showAlert("Format Pendapatan Debitur Range BSI harus seperti 10-20.");
+        return;
+      }
+
+      const result = hitungRacDbr(values);
+      showManualSummary({
+        angsuranDebitur: values.angsuranLainDebitur,
+        angsuranPasangan: values.angsuranLainPasangan,
+        angsuranDiajukan: values.angsuranDiajukan,
+        angsuranMuf: values.angsuranMuf
+      });
+      manualResultCard.innerHTML += `
+        <div class="result-row">
+          <span class="result-label">DBR (%)</span>
+          <span class="result-value">${result.dbrPct.toFixed(2)} %</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Status</span>
+          <span class="result-value result-status ${result.lulus ? "ok" : "fail"}">${result.lulus ? "LULUS" : "TIDAK LULUS"}</span>
+        </div>
+      `;
+      manualNotice.hidden = false;
+      manualNotice.textContent = "Perhitungan manual selesai.";
+    });
+
+    document.querySelector("#copyManualToAuto").addEventListener("click", () => {
+      const values = getManualValues();
+      copyManualToAuto(values);
+      manualNotice.hidden = false;
+      manualNotice.textContent = "Data manual sudah disalin ke tab otomatis.";
+      switchTab("autoPanel");
+    });
+
+    manualForm.addEventListener("reset", () => {
+      window.setTimeout(() => {
+        manualPlatform.value = "LIVIN";
+        refreshManualCategories();
+        applyManualPlatformState();
+        applyManualPasanganState();
+        manualNotice.hidden = true;
+        manualResultCard.innerHTML = '<p class="result-empty">Belum ada input manual</p>';
+      });
+    });
+
+    document.querySelector("#saveApiBaseUrl").addEventListener("click", () => {
+      const value = cleanApiBaseUrl(apiBaseUrl.value);
+      localStorage.setItem(apiBaseUrlStorageKey, value);
+      apiBaseUrl.value = value;
+      showApiSettingNotice(value
+        ? `URL API disimpan: ${value}`
+        : "URL API dikosongkan. Aplikasi memakai server yang sama dengan halaman ini.");
+    });
+
+    document.querySelector("#resetApiBaseUrl").addEventListener("click", () => {
+      localStorage.removeItem(apiBaseUrlStorageKey);
+      apiBaseUrl.value = "";
+      showApiSettingNotice("URL API direset. Aplikasi memakai server yang sama dengan halaman ini.");
+    });
+
+    platform.value = "LIVIN";
+    refreshCategories();
+    applyPlatformState();
+    applyPasanganState();
+    manualPlatform.value = "LIVIN";
+    refreshManualCategories();
+    applyManualPlatformState();
+    applyManualPasanganState();
+    apiBaseUrl.value = cleanApiBaseUrl(localStorage.getItem(apiBaseUrlStorageKey));
+  </script>
+</body>
+</html>
