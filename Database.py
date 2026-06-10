@@ -1,10 +1,14 @@
-import psycopg2
-import psycopg2.extras
-import oracledb
 import os
 import sys
 from contextlib import contextmanager
 from typing import List, Dict, Any
+
+
+def _psycopg2():
+    import psycopg2
+    import psycopg2.extras
+
+    return psycopg2
 
 # DB_CONFIG_1 = {
 #     "host"    : "10.22.11.99",a
@@ -17,6 +21,7 @@ from typing import List, Dict, Any
 
 
 def GetEnviCbas ():
+    psycopg2 = _psycopg2()
     conn = psycopg2.connect(
         host    = "10.22.11.99",
         port    = '5432',
@@ -28,6 +33,7 @@ def GetEnviCbas ():
     return conn
 
 def GetEnviB ():
+    psycopg2 = _psycopg2()
     conn = psycopg2.connect(
         host    = "10.22.15.141",
         port    = '5432',
@@ -119,6 +125,7 @@ def koneksi_db():
 # ==============================================================================
 def ambilData(query: str) -> List[Dict[str, Any]]:
     """Eksekusi SELECT pada PostgreSQL, kembalikan list of dict."""
+    psycopg2 = _psycopg2()
     with koneksi_db() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
             cur.execute(query)
@@ -126,6 +133,7 @@ def ambilData(query: str) -> List[Dict[str, Any]]:
             return [dict(row) for row in rows]
         
 def ambilCabang (query:str)-> List[Dict[str, Any]]:
+    psycopg2 = _psycopg2()
     with koneksi_db_EnviB() as conn:   # ✅ Koneksi ke DB yang benar
         with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
             cur.execute(query)
